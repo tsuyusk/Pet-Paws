@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
 import { Map, TileLayer, Marker } from 'react-leaflet'
 import axios from 'axios'
@@ -45,14 +45,12 @@ const CreatePetPoint = () => {
     description: ''
   })
 
-  const [selectedUf, setSelectedUf] = useState('0')
-  const [selectedUfInitials, setSelectedUfInitials] = useState('0')
-  const [selectedCity, setSelectedCity] = useState('0')
+  const [selectedUf, setSelectedUf] = useState('')
+  const [selectedUfInitials, setSelectedUfInitials] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
   const [selectedItem, setSelectedItem] = useState<number[]>([])
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0])
   const [selectedFile, setSelectedFile] = useState<File>()
-
-  const history = useHistory()
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(position => {
@@ -79,7 +77,7 @@ const CreatePetPoint = () => {
   }, [])
 
   useEffect(() => {
-    if (selectedUfInitials === "0") {
+    if (!selectedUfInitials) {
       return
     }
 
@@ -95,6 +93,7 @@ const CreatePetPoint = () => {
 
     function defineUfInitials(uf: string) {
       if (uf === "Acre") {
+        console.log("ac")
         return setSelectedUfInitials("AC")
       }
       if (uf === "Alagoas") {
@@ -234,13 +233,11 @@ const CreatePetPoint = () => {
     await api.post('petpoints', data)
 
     setModalVisibility(true);
-
-    // history.push('/')
   }
 
   return (
     <>
-      {(modalVisibility === true) ? <SuccessModal /> : <></>}
+      {modalVisibility && <SuccessModal />}
       <div id="page-create-point">
         <header>
           <Link to="/">
@@ -341,21 +338,24 @@ const CreatePetPoint = () => {
               <div className="field">
                 <label htmlFor="uf">Estado (UF)</label>
                 <select value={selectedUf} onChange={handleSelectUf} name="uf" id="uf">
-                  <option value="0">Selecione uma UF</option>
+                  <option value="">Selecione uma UF</option>
                   {ufs.map(uf => (
                     <option key={uf} value={uf}>{uf}</option>
                   ))}
                 </select>
               </div>
+              {
+              selectedUfInitials &&
               <div className="field">
                 <label htmlFor="city">Cidade</label>
                 <select value={selectedCity} onChange={handleSelectCity} name="city" id="city">
-                  <option value="0">Selecione uma cidade</option>
+                  <option value="">Selecione uma cidade</option>
                   {cities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
                 </select>
               </div>
+}
             </div>
           </fieldset>
 
